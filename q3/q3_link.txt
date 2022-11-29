@@ -1,0 +1,5 @@
+solution:
+https://www.codingame.com/training/hard/surface/solution?id=27423912
+
+question:
+https://www.codingame.com/ide/puzzle/surface
