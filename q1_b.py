@@ -1,59 +1,89 @@
+def bounded_subsets_doctest(lst: list, c: int):
+    """
+    helper function for doctesting bounded_subsets()
+    """
+    for i in bounded_subsets(lst, c):
+        print(i)
 
 
-class bounded_subsets:
-    def __init__(self, s, c):
-        self.s = sorted(s)
-        self.c = c
-        self.state = []
-        self.is_first = True
+def bounded_subsets(lst: list, c: int):
+    """
+    >>> bounded_subsets_doctest([3, 2, 1], 5)
+    []
+    [1]
+    [2]
+    [3]
+    [1, 2]
+    [1, 3]
 
-    def __iter__(self):
-        return self
+    >>> bounded_subsets_doctest([3, 2, 1, 4], 5)
+    []
+    [1]
+    [2]
+    [3]
+    [1, 2]
+    [4]
+    [1, 3]
+    [1, 4]
+    [2, 3]
 
-    def __next__(self):
-        if sum(self.state) > self.c:
-            raise StopIteration
-        if self.is_first:
-            self.is_first = False
-            return self.state
-        while sum(self.state) <= self.c:
-            if len(self.state) != 0:
-                res = self.state[-1]
-                next_idx = self.s.index(res) + 1
-            else:
-                next_idx = 0
-            if next_idx < len(self.s) and sum(self.state[:-1]) + self.s[next_idx] <= self.c:
-                if len(self.state) != 0:
-                    self.state.pop(-1)
-                self.state.append(self.s[next_idx])
-                return self.state
+    """
+    res = []
+    lst = sorted(lst)
+    idx = 0
+    last_sum = lst[idx]
+    yield res
+    while last_sum <= c:
+        if last_sum in lst and lst.index(last_sum) < len(lst):
+            idx = lst.index(last_sum)
+            while res:
+                res.pop(-1)
+        else:
+            i = 0
+            while i < len(lst) and last_sum - lst[i] in lst and lst[i] != lst[lst.index(last_sum - lst[i])] and lst[i] + lst[lst.index(last_sum - lst[i])] == last_sum:
+                while res:
+                    res.pop(-1)
+                if lst[i] < lst[lst.index(last_sum - lst[i])]:
+                    res.append(lst[i])
+                    res.append(lst[lst.index(last_sum - lst[i])])
+                    yield res
+                i += 1
+        if idx < len(lst):
+            res.append(lst[idx])
+            yield res
 
-
-
-            if len(self.state) > 0 and self.state[-1] == self.s[-1] or sum(self.state) == self.c:
-                self.state.pop(-1)
-                if len(self.state) == 0:
-                    next_idx = 0
-                else:
-                    res = self.state[-1]
-                    next_idx = self.s.index(res) + 1
-                if next_idx + 1 < len(self.s) and self.s[next_idx] + self.s[next_idx + 1] <= self.c\
-                        and len(self.state) > 0:
-                    self.state.pop(-1)
-                self.state.append(self.s[next_idx])
-                self.state.append(self.s[next_idx + 1])
-                if sum(self.state) <= self.c:
-                    return self.state
-                else:
-                    raise StopIteration
-
-            if next_idx < len(self.s) and sum(self.state[:-1]) + self.s[next_idx] <= self.c:
-                if len(self.state) != 0:
-                    self.state.pop(-1)
-                self.state.append(self.s[next_idx])
-                return self.state
+        if res and 1 < len(lst) and lst[0] + lst[1] == last_sum:
+            last_out = res.pop(-1)
+            res.append(lst[0])
+            res.append(lst[1])
+            yield res
+        if res and res[-1] - lst[0] in lst and lst[0] != lst[lst.index(res[-1] - lst[0])] and lst.index(res[-1] - lst[0]) < len(lst) and lst[0] + lst[lst.index(res[-1] - lst[0])] == last_sum:
+            last_out = res.pop(-1)
+            res.append(lst[0])
+            res.append(lst[lst.index(last_out - lst[0])])
+            yield res
+        if len(res) > 1 and lst.index(res[-1]) + 1 < len(lst) and sum(res[:-1]) + lst[lst.index(res[-1]) + 1] == last_sum:
+            last_out = res.pop(-1)
+            res.append(lst[lst.index(last_out + 1)])
+            yield res
+        if len(res) > 1 and lst.index(res[-2]) + 2 < len(lst) and lst[lst.index(res[-2]) + 1] + lst[lst.index(res[-2]) + 2] == last_sum:
+            res.pop(-1)
+            last_out = res.pop(-1)
+            res.append(lst[lst.index(last_out + 1)])
+            res.append(lst[lst.index(last_out + 2)])
+            yield res
+        if len(res) > 2 and lst.index(res[-2]) + 2 < len(lst) and sum(res[:-3]) + lst[lst.index(res[-2]) + 1] + lst[lst.index(res[-2]) + 2] == last_sum:
+            res.pop(-1)
+            res.append(lst[lst.index(res[-1] + 1)])
+            res.append(lst[lst.index(res[-1] + 1)])
+            yield res
+        else:
+            last_sum += 1
+            idx += 1
+            if res:
+                res.pop(-1)
 
 
 if __name__ == '__main__':
-    for s in bounded_subsets(range(50, 150), 103):
-        print(s)  # prints: [], [50], [51],..., [103], [50, 51], [50, 52], [50, 53], [51, 52]
+    for s in bounded_subsets([1, 2, 3, 5, 4], 5):
+        print(s)

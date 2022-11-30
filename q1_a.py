@@ -8,6 +8,8 @@ def bounded_subsets_doctest(lst: list, c: int):
 
 def bounded_subsets(lst: list, c: int):
     """
+    Making an iterator style function using generator
+
     >>> bounded_subsets_doctest([2,5,8,1], 10)
     []
     [1]
